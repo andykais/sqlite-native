@@ -3,6 +3,7 @@ import { create_database, assert_equals } from './util.ts'
 
 Deno.test('statements', async () => {
   const db = await create_database('test.db')
+
   db.exec(`
     CREATE TABLE tbl (
       id INTEGER PRIMARY KEY NOT NULL,

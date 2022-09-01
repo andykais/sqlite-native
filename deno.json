@@ -4,5 +4,6 @@
     "test": "deno test --unstable --allow-ffi --check test/*.test.ts",
     "test:watch": "deno test --watch --unstable --allow-ffi --allow-read --allow-write --check test/statements.test.ts",
     "compile_sqlite:macos": "deno run --check --allow-run=gcc,unzip --allow-read --allow-write deps/compile.ts macos"
+    "compile_sqlite:linux": "deno run --check --allow-run=gcc,unzip --allow-read --allow-write deps/compile.ts linux"
   }
 }

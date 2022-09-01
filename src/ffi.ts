@@ -1,4 +1,5 @@
 // deno-lint-ignore-file explicit-module-boundary-types
+import * as fs from 'https://deno.land/std@0.152.0/fs/mod.ts'
 import {
   SQLITE3_DONE,
   SQLITE3_MISUSE,
@@ -28,23 +29,27 @@ class SqliteFFI {
     let sqlite_lib: Uint8Array
     let shared_lib_path = this.options.sqlite_path
     if (shared_lib_path === undefined) {
-      shared_lib_path = await Deno.makeTempFile({ prefix: 'sqlite-native-shared-lib' })
-      switch(Deno.build.os) {
-        case 'darwin':
-          sqlite_lib = (await import('./binaries/macos.ts')).default
-          break
-        case 'linux':
-          sqlite_lib = (await import('./binaries/linux.ts')).default
-          break
-        case 'windows':
-          sqlite_lib = (await import('./binaries/windows.ts')).default
-          break
-        default:
-          throw new Error(`unexpected arch ${Deno.build.os}`)
+      // TODO we should get the '/tmp' dir in a more agnostic way (itll be different on windows machines)
+      shared_lib_path = '/tmp/sqlite-native-shared'
+      // await Deno.makeTempFile({ prefix: 'sqlite-native-shared-lib' })
+      if (await fs.exists(shared_lib_path) === false) {
+        switch(Deno.build.os) {
+          case 'darwin':
+            sqlite_lib = (await import('./binaries/macos.ts')).default
+            break
+          case 'linux':
+            sqlite_lib = (await import('./binaries/linux.ts')).default
+            break
+          case 'windows':
+            sqlite_lib = (await import('./binaries/windows.ts')).default
+            break
+          default:
+            throw new Error(`unexpected arch ${Deno.build.os}`)
+        }
+        await Deno.writeFile(shared_lib_path, sqlite_lib)
       }
-      await Deno.writeFile(shared_lib_path, sqlite_lib)
     }
-    // TODO this step is stupid, we should be able to avoid it
+    // TODO this step is stupid, we should be able to avoid it https://github.com/denoland/deno/issues/15700
     this.shared_lib = Deno.dlopen(shared_lib_path, SYMBOLS)
     this.sqlite_handle = this.sqlite3_open_v2(database_path, flags);
   }
