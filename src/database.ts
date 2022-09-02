@@ -29,6 +29,8 @@ type BindValue =
   | Date
   | Uint8Array;
 
+type RowGeneric = Record<string, ColumnValue>
+
 class Database {
   flags = 0
   ffi: SqliteFFI
@@ -83,7 +85,7 @@ class Database {
    * @returns A `PreparedStatement` object, on which you can call `execute` multiple
    * times and then `finalize` it.
    */
-  public prepare<T extends Record<string, ColumnValue> = Record<string, ColumnValue>>(sql: string): PreparedStatement<T> {
+  public prepare<T extends RowGeneric = RowGeneric>(sql: string): PreparedStatement<T> {
     const handle = this.ffi.sqlite3_prepare_v2(sql);
     return new PreparedStatement<T>(this, handle);
   }
@@ -99,10 +101,84 @@ class Database {
     * `)
     * ```
     */
-  public exec(sql: string): void {
+  public exec<T extends RowGeneric>(sql: string, ...args: BindValue[]): void
+  public exec<T extends RowGeneric>(sql: string, args: Record<string, BindValue>): void
+  public exec<T extends RowGeneric>(sql: string, ...args: BindValue[] | [Record<string, BindValue>]): void {
     const sql_queries = sql.split(';')
     for (const query of sql_queries) {
-      this.prepare(query).exec()
+      this.prepare(query).exec(...args as any)
+    }
+  }
+
+  public one<T extends RowGeneric>(sql: string, ...args: BindValue[]): T;
+  public one<T extends RowGeneric>(sql: string, args: Record<string, BindValue>): T;
+  public one<T extends RowGeneric>(sql: string, ...args: BindValue[] | [Record<string, BindValue>]): T | undefined {
+    return this.prepare<T>(sql).one(...args as any)
+  }
+
+  public all<T extends RowGeneric>(sql: string, ...args: BindValue[]): T[];
+  public all<T extends RowGeneric>(sql: string, args: Record<string, BindValue>): T[];
+  public all<T extends RowGeneric>(sql: string, ...args: BindValue[] | [Record<string, BindValue>]): T[] {
+    return this.prepare<T>(sql).all(...args as any)
+  }
+
+  public transaction<T>(fn: () => T): () => T {
+    const { before, after, undo } = this.get_transaction_handlers()
+    return () => {
+      try {
+        this.exec(before)
+        const result = fn()
+        if (this.in_transaction() === false) {
+          throw new Error('SQLite forcefully rolled back the transaction, likely due to an ON CONFLICT clause or SQLITE_BUSY exception')
+        }
+        this.exec(after)
+        return result
+      } catch (e) {
+        this.exec(undo)
+        throw e
+      }
+    }
+  }
+
+  /**
+    * Start a transaction that lasts the duration of the promise returned.
+    */
+  public transaction_async<T>(func: () => Promise<T>): () => Promise<T> {
+    const { before, after, undo } = this.get_transaction_handlers()
+    return async () => {
+      try {
+        this.exec(before)
+        const result = await func()
+        if (this.in_transaction() === false) {
+          throw new Error('SQLite forcefully rolled back the transaction, likely due to an ON CONFLICT clause or SQLITE_BUSY exception')
+        }
+        this.exec(after)
+        return result
+      } catch (e) {
+        this.exec(undo)
+        throw e
+      }
+    }
+  }
+
+  public in_transaction() {
+    return this.ffi.sqlite3_get_autocommit() === false
+  }
+
+  private get_transaction_handlers() {
+    if (this.in_transaction()) {
+      const transaction_id = `t_${Date.now()}`
+      return {
+        before: `SAVEPOINT ${transaction_id}`,
+        after: `RELEASE ${transaction_id}`,
+        undo: `ROLLBACK TO ${transaction_id}`,
+      }
+    } else {
+      return {
+        before: `BEGIN`,
+        after: `COMMIT`,
+        undo: `ROLLBACK`,
+      }
     }
   }
 }

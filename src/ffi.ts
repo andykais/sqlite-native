@@ -521,8 +521,8 @@ class SqliteFFI {
     return Number(this.lib.sqlite3_last_insert_rowid(this.sqlite_handle));
   }
 
-  public sqlite3_get_autocommit(db: sqlite3): boolean {
-    return Boolean(this.lib.sqlite3_get_autocommit(db));
+  public sqlite3_get_autocommit(): boolean {
+    return Boolean(this.lib.sqlite3_get_autocommit(this.sqlite_handle));
   }
 
   public sqlite3_clear_bindings(db: sqlite3, stmt: sqlite3_stmt): void {

@@ -33,7 +33,7 @@ switch(arch) {
     break
   }
   case 'linux': {
-    const filename = 'libsqlite3'
+    const filename = 'libsqlite3.so'
     console.log('compiling sqlite.o from sqlite3.c ...')
     await exec(`gcc -c -fpic -o ${BUILD_FOLDER}/sqlite3.o ${SQLITE_SOURCE}/sqlite3.c`)
     console.log('compiling sqlite.so from sqlite3.o ...')
