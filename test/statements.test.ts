@@ -13,9 +13,9 @@ Deno.test('statements', async () => {
   const insert_stmt = db.prepare('INSERT INTO tbl (val) VALUES (?)')
   const info_1 = insert_stmt.exec('hello')
   const info_2 = insert_stmt.exec('world')
-  assert_equals(info_1.lastInsertRowId, 1)
+  assert_equals(info_1.last_insert_row_id, 1)
   assert_equals(info_1.changes, 1)
-  assert_equals(info_2.lastInsertRowId, 2)
+  assert_equals(info_2.last_insert_row_id, 2)
   assert_equals(info_2.changes, 1)
 
   const select_stmt = db.prepare<{ id: number; val: string }>('SELECT * FROM tbl')

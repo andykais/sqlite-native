@@ -24,7 +24,7 @@ type ValueOf<T> = T[keyof T];
 type SQLiteColumnType = ValueOf<typeof SqliteType>
 
 interface ExecInfo {
-  lastInsertRowId: number
+  last_insert_row_id: number
   changes: number
 }
 
@@ -74,8 +74,8 @@ class PreparedStatement<T> {
       this.bindAll(...args as BindValue[]);
     }
     this.step();
-    const info = {
-      lastInsertRowId: this.sqlite.sqlite3_last_insert_rowid(),
+    const info: ExecInfo = {
+      last_insert_row_id: this.sqlite.sqlite3_last_insert_rowid(),
       changes:  this.sqlite.sqlite3_changes()
     }
     this.reset();
