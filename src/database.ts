@@ -4,7 +4,7 @@ import {
   SQLITE3_OPEN_READONLY,
   SQLITE3_OPEN_READWRITE,
 } from "./constants.ts";
-import { PreparedStatement } from './statement.ts'
+import { PreparedStatement, type RowGeneric } from './statement.ts'
 import { SqliteFFI } from './ffi.ts'
 
 interface DatabaseOptions {
@@ -28,8 +28,6 @@ type BindValue =
   | undefined
   | Date
   | Uint8Array;
-
-type RowGeneric = Record<string, ColumnValue>
 
 class Database {
   flags = 0
@@ -104,22 +102,26 @@ class Database {
   public exec<T extends RowGeneric>(sql: string, ...args: BindValue[]): void
   public exec<T extends RowGeneric>(sql: string, args: Record<string, BindValue>): void
   public exec<T extends RowGeneric>(sql: string, ...args: BindValue[] | [Record<string, BindValue>]): void {
-    const sql_queries = sql.split(';')
+    const sql_queries = sql
+      .split(';')
+      .map(query => query.trim())
+      .filter(query => query.length)
+
     for (const query of sql_queries) {
-      this.prepare(query).exec(...args as any)
+      this.prepare(query).exec(...args as BindValue[])
     }
   }
 
   public one<T extends RowGeneric>(sql: string, ...args: BindValue[]): T;
   public one<T extends RowGeneric>(sql: string, args: Record<string, BindValue>): T;
   public one<T extends RowGeneric>(sql: string, ...args: BindValue[] | [Record<string, BindValue>]): T | undefined {
-    return this.prepare<T>(sql).one(...args as any)
+    return this.prepare<T>(sql).one(...args as BindValue[])
   }
 
   public all<T extends RowGeneric>(sql: string, ...args: BindValue[]): T[];
   public all<T extends RowGeneric>(sql: string, args: Record<string, BindValue>): T[];
   public all<T extends RowGeneric>(sql: string, ...args: BindValue[] | [Record<string, BindValue>]): T[] {
-    return this.prepare<T>(sql).all(...args as any)
+    return this.prepare<T>(sql).all(...args as BindValue[])
   }
 
   public transaction<T>(fn: () => T): () => T {

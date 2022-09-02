@@ -8,12 +8,18 @@ import {
   SQLITE3_OPEN_READWRITE,
   SQLITE3_ROW,
 } from "./constants.ts";
-import { toCString, isNull } from "./util.ts";
+import { toCString, isNull, SqliteError } from "./util.ts";
 import type { DatabaseOptions } from './database.ts'
 import type { SQLiteColumnType } from './statement.ts'
 
-
-const { op_ffi_cstr_read } = (Deno as any).core.ops;
+interface DenoCore {
+  core: {
+    ops: {
+      op_ffi_cstr_read: (ptr: Deno.PointerValue) => string
+    }
+  }
+}
+const { op_ffi_cstr_read } = ((Deno as unknown) as DenoCore).core.ops;
 
 type Sqlite3Handle = Deno.PointerValue
 type Sqlite3Stmt = Deno.PointerValue
@@ -103,7 +109,7 @@ class SqliteFFI {
         msg = new Error(`Failed to get error message.`);
         msg.cause = e;
       }
-      throw new Error(`(${result}) ${this.sqlite3_errstr(result)}: ${msg}`);
+      throw new SqliteError(result, `${this.sqlite3_errstr(result)}: ${msg}`);
     }
   }
 
@@ -159,7 +165,7 @@ class SqliteFFI {
     return result;
   }
 
-  public sqlite3_finalize(db: sqlite3, stmt: sqlite3_stmt): void {
+  public sqlite3_finalize(stmt: sqlite3_stmt): void {
     const result = this.lib.sqlite3_finalize(stmt) as number;
     this.unwrap_error(this.sqlite, result);
   }
@@ -180,7 +186,6 @@ class SqliteFFI {
   }
 
   public sqlite3_bind_null(
-    db: sqlite3,
     stmt: sqlite3_stmt,
     index: number,
   ): void {
@@ -525,7 +530,7 @@ class SqliteFFI {
     return Boolean(this.lib.sqlite3_get_autocommit(this.sqlite_handle));
   }
 
-  public sqlite3_clear_bindings(db: sqlite3, stmt: sqlite3_stmt): void {
+  public sqlite3_clear_bindings(stmt: sqlite3_stmt): void {
     const result = this.lib.sqlite3_clear_bindings(stmt) as number;
     this.unwrap_error(this.sqlite, result);
   }

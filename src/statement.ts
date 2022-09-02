@@ -22,6 +22,7 @@ const SqliteType = {
 } as const
 type ValueOf<T> = T[keyof T];
 type SQLiteColumnType = ValueOf<typeof SqliteType>
+type RowGeneric = Record<string, ColumnValue>
 
 interface ExecInfo {
   last_insert_row_id: number
@@ -31,7 +32,7 @@ interface ExecInfo {
 /**
  * Represents a prepared statement. Should only be created by `Database.prepare()`.
  */
-class PreparedStatement<T> {
+class PreparedStatement<T extends RowGeneric> {
   /**
    * We need to store references to any type that involves passing pointers
    * to avoid V8's GC deallocating them before the statement is finalized.
@@ -118,15 +119,19 @@ class PreparedStatement<T> {
     return row
   }
 
+  public finalize() {
+    return this.sqlite.sqlite3_finalize(this.handle)
+  }
+
   private getCurrentRow(): T {
     const column_count = this.getColumnCount()
-    const row: {[col_name: string]: BindValue} = {}
+    const row: {[col_name: string]: ColumnValue} = {}
     for (let col_index = 0; col_index < column_count; col_index++) {
       const col_value = this.getCurrentColumn(col_index)
       const col_name = this.getColumnName(col_index)
       row[col_name] = col_value
     }
-    return row as any
+    return row as T
   }
 
   private getColumnCount() {
@@ -310,5 +315,5 @@ class PreparedStatement<T> {
 }
 
 
-export type { SQLiteColumnType }
+export type { SQLiteColumnType, RowGeneric }
 export { PreparedStatement, SqliteType }

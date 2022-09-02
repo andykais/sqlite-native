@@ -11,3 +11,10 @@ export function isObject(value: unknown): boolean {
 export function isNull(v: Deno.PointerValue): boolean {
   return v === 0 || v === 0n;
 }
+
+export class SqliteError extends Error {
+  public name = 'SqliteError'
+  public constructor(public code: number, message: string) {
+    super(`(${code}) ${message}`)
+  }
+}
