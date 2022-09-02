@@ -28,7 +28,7 @@ Deno.test('statements', async () => {
   db.close()
 })
 
-Deno.test(async () => {
+Deno.test('statements w/ alter table', async () => {
   const db = await create_database('test.db')
 
   db.exec(`

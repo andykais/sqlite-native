@@ -1,8 +1,8 @@
 {
   "tasks": {
     "develop": "deno run --watch --check sqlite3.ts",
-    "test": "deno test --unstable --allow-ffi --check test",
-    "test:watch": "deno test --watch --unstable --allow-ffi --allow-read --allow-write --check test",
+    "test": "deno test --check --unstable --allow-ffi --allow-read --allow-write test",
+    "test:watch": "deno test --watch --check --unstable --allow-ffi --allow-read --allow-write test",
     "compile_sqlite:macos": "deno run --check --allow-run=gcc,unzip --allow-read --allow-write deps/compile.ts macos"
     "compile_sqlite:linux": "deno run --check --allow-run=gcc,unzip --allow-read --allow-write deps/compile.ts linux"
   }
