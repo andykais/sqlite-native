@@ -35,10 +35,6 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Setup GCC
-        if: matrix.os == 'ubuntu-latest'
-        uses: egor-tensin/setup-gcc@v1
-
       # Uncomment this step to verify the use of 'deno fmt' on each commit.
       # - name: Verify formatting
       #   run: deno fmt --check

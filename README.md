@@ -1,4 +1,5 @@
 # SQLite Native
+Fast, portable sqlite library 
 A sqlite library for deno which includes a portable native sqlite implementation
 
 
@@ -24,4 +25,8 @@ const row = select_stmt.one(info.last_insert_row_id)
 console.log(row.foo)
 
 db.close()
+```
+
+```bash
+deno run --unstable --allow-ffi --allow-read --allow-write sample.ts
 ```
