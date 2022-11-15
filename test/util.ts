@@ -5,9 +5,13 @@ import { Database } from '../src/mod.ts'
 const test_dbs_folder = path.join(path.dirname(path.fromFileUrl(import.meta.url)), 'fixtures')
 await Deno.mkdir(test_dbs_folder, { recursive: true })
 
+function get_db_path(db_name: string) {
+  return path.join(test_dbs_folder, db_name)
+}
+
 // test helpers
 async function create_database(db_name: string) {
-  const db_path = path.join(test_dbs_folder, db_name)
+  const db_path = get_db_path(db_name)
   if (await fs.exists(db_path)) await Deno.remove(db_path)
   if (await fs.exists(db_path + '-wal')) await Deno.remove(db_path + '-wal')
   if (await fs.exists(db_path + '-shm')) await Deno.remove(db_path + '-shm')
@@ -30,4 +34,4 @@ export {
   assertThrows as assert_throws,
   assertRejects as assert_rejects
 } from "https://deno.land/std@0.153.0/testing/asserts.ts";
-export { create_database, connect_database }
+export { create_database, connect_database, get_db_path }
