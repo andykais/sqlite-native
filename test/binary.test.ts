@@ -1,4 +1,5 @@
-import { create_database, get_db_path, assert_equals, assert_throws } from './util.ts'
+import * as fs from "https://deno.land/std@0.153.0/fs/mod.ts";
+import { create_database, get_db_path, assert_equals } from './util.ts'
 import { Database } from '../src/mod.ts'
 
 Deno.test('fresh binary install', async () => {
@@ -28,12 +29,14 @@ Deno.test('fresh binary install', async () => {
 
 
   // ensure that when we remove the shared lib file, we reinstall it
-  await Deno.remove('/tmp/sqlite-native-shared')
+  const shared_lib_path = '/tmp/sqlite-native-shared'
+  await Deno.remove(shared_lib_path)
   const db_2 = new Database(get_db_path('test.db'))
   await db_2.connect()
+  assert_equals(true, await fs.exists(shared_lib_path))
 
   const select_stmt_2 = db_2.prepare<{ id: number; val: string }>('SELECT * FROM tbl')
-  const rows_2 = select_stmt.all()
+  const rows_2 = select_stmt_2.all()
   assert_equals(rows_2.length, 2)
   assert_equals(rows_2[0].val, "hello")
   assert_equals(rows_2[1].val, "world")
