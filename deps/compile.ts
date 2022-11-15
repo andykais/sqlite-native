@@ -1,4 +1,4 @@
-import * as path from 'https://deno.land/std/path/mod.ts'
+import * as path from 'https://deno.land/std@0.152.0/path/mod.ts'
 
 const deps_folder = path.dirname(path.fromFileUrl(import.meta.url))
 const src_folder = path.join(path.dirname(deps_folder), 'src')
