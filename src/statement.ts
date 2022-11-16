@@ -32,7 +32,7 @@ interface ExecInfo {
 /**
  * Represents a prepared statement. Should only be created by `Database.prepare()`.
  */
-class PreparedStatement<T extends RowGeneric> {
+class PreparedStatement<T extends RowGeneric = RowGeneric> {
   /**
    * We need to store references to any type that involves passing pointers
    * to avoid V8's GC deallocating them before the statement is finalized.
