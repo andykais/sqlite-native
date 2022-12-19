@@ -1,7 +1,4 @@
-// deno-lint-ignore-file explicit-module-boundary-types
-import * as fs from 'https://deno.land/std@0.152.0/fs/mod.ts'
 import { SQLiteTarget } from './binary_manager.ts'
-import * as path from 'https://deno.land/std@0.152.0/path/mod.ts'
 import {
   SQLITE3_DONE,
   SQLITE3_MISUSE,
@@ -34,7 +31,6 @@ class SqliteFFI {
   public constructor(private options: DatabaseOptions) {}
 
   public async connect(database_path: string, flags: number) {
-    let sqlite_lib: Uint8Array
     const sqlite_target = await SQLiteTarget.create()
     const shared_lib_path = await sqlite_target.fetch_binary(this.options.sqlite_path)
     // NOTE if deno implements ffi via in memory buffer (https://github.com/denoland/deno/issues/15700)

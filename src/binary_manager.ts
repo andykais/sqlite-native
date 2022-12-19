@@ -20,7 +20,6 @@ export class SQLiteTarget {
       const home_dir = Deno.env.get('HOME')
       if (home_dir === undefined) throw new Error(`Cannot find $HOME`)
       return path.join(home_dir, '.cache', 'deno_sqlite_native')
-      throw new Error('unimplemented')
     } else {
       throw new Error('unimplemented')
     }
@@ -30,10 +29,9 @@ export class SQLiteTarget {
   }
 
   get filename() {
-    let target = this.build.target
-    return `sqlite_${target}${this.ext}`
+    const target = this.build.target
     // TODO include musl-c detection
-    return target
+    return `sqlite_${target}${this.ext}`
   }
 
   get filepath() {
@@ -42,6 +40,7 @@ export class SQLiteTarget {
     return path.join(binary_folder, this.filename)
   }
 
+  // deno-lint-ignore require-await
   static async create() {
     return new SQLiteTarget(Deno.build)
   }
