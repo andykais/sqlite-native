@@ -1,10 +1,11 @@
 {
   "tasks": {
     "lint": "deno lint",
-    "develop": "deno run --watch --check --allow-ffi --allow-read --allow-write --unstable src/mod.ts",
-    "test": "deno test --check --unstable --allow-ffi --allow-read --allow-write test",
-    "test:watch": "deno test --watch --check --unstable --allow-ffi --allow-read --allow-write test",
-    "compile_sqlite:macos": "deno run --check --allow-run=gcc,unzip --allow-read --allow-write deps/compile.ts macos"
-    "compile_sqlite:linux": "deno run --check --allow-run=gcc,unzip --allow-read --allow-write deps/compile.ts linux"
+    "develop": "deno run --watch --check --allow-ffi --allow-env --allow-read --allow-write --unstable src/mod.ts",
+    "test": "deno test --check --unstable --allow-ffi --allow-env --allow-read --allow-write test",
+    "test:watch": "deno test --watch --check --unstable --allow-env --allow-ffi --allow-read --allow-write test",
+    "test:only:watch": "deno test --watch --check --unstable --allow-env --allow-ffi --allow-read --allow-write",
+    "compile:macos": "deno run --check --allow-run=gcc,unzip --allow-read=. --allow-write=. deps/compile.ts macos"
+    "compile:linux": "deno run --check --allow-run=gcc,unzip --allow-read=. --allow-write=. deps/compile.ts linux"
   }
 }
