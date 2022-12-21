@@ -24,6 +24,7 @@ type Sqlite3Handle = Deno.PointerValue
 type Sqlite3Stmt = Deno.PointerValue
 
 class SqliteFFI {
+  public sqlite_target?: SQLiteTarget
   private shared_lib!: Deno.DynamicLibrary<typeof SYMBOLS>
   // private lib!: Deno.DynamicLibrary<typeof SYMBOLS>['symbols']
   private sqlite_handle!: Sqlite3Handle
@@ -31,13 +32,14 @@ class SqliteFFI {
   public constructor(private options: DatabaseOptions) {}
 
   public async connect(database_path: string, flags: number) {
-    const sqlite_target = await SQLiteTarget.create()
-    const shared_lib_path = await sqlite_target.fetch_binary(this.options.sqlite_path)
+    const sqlite_target = await SQLiteTarget.create(this.options.sqlite_path)
+    const shared_lib_path = await sqlite_target.fetch_binary()
     // NOTE if deno implements ffi via in memory buffer (https://github.com/denoland/deno/issues/15700)
     // We can build our shared lib into Uint8Array buffers, dynamic import them, and then dlopen the buffer
     // deno also does not lock down --allow-net more than the domain name, with more path restrictions, we can have higher FFI security
     this.shared_lib = Deno.dlopen(shared_lib_path, SYMBOLS)
     this.sqlite_handle = this.sqlite3_open_v2(database_path, flags);
+    this.sqlite_target = sqlite_target
   }
 
   public get sqlite() {

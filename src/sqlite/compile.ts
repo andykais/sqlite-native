@@ -30,10 +30,9 @@ async function copy_binary(arch: string, filename: string) {
   const sqlite_target = await SQLiteTarget.create()
   if (sqlite_target.build.os !== arch) throw new Error(`Unexpected os ${arch} when building for ${arch}`)
   const src_filepath = path.join(BUILD_FOLDER, filename)
-  await Deno.mkdir(path.dirname(sqlite_target.filepath), { recursive: true })
-  const dest_filepath = sqlite_target.filepath
+  await Deno.mkdir(path.dirname(sqlite_target.src_filepath), { recursive: true })
   console.log(`copying binary to binaries/${sqlite_target.filename}...`)
-  await Deno.copyFile(src_filepath, dest_filepath)
+  await Deno.copyFile(src_filepath, sqlite_target.src_filepath)
 }
 
 const arch = Deno.args[0]

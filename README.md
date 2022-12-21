@@ -30,3 +30,13 @@ db.close()
 ```bash
 deno run --unstable --allow-ffi --allow-read --allow-write sample.ts
 ```
+
+
+## Development
+```bash
+# compile the sqlite shared library
+# (for a different os, use compile:macos/compile:win32)
+deno task compile:linux 
+# run the test suite
+deno task test:watch
+```

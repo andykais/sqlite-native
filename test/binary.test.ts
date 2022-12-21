@@ -29,7 +29,7 @@ Deno.test('fresh binary install', async () => {
 
 
   // ensure that when we remove the shared lib file, we reinstall it
-  const shared_lib_path = '/tmp/sqlite-native-shared'
+  const shared_lib_path = db.ffi.sqlite_target!.filepath
   await Deno.remove(shared_lib_path)
   const db_2 = new Database(get_db_path('test.db'))
   await db_2.connect()
