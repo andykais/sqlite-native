@@ -66,14 +66,20 @@ export class SQLiteTarget {
       const pattern = new URLPattern({ pathname: '/:user/:repo/:tag/*' })
       const match = pattern.exec(import_url)
       const tag = match?.pathname.groups.tag
-      const response = await fetch(`https://raw.githubusercontent.com/releases/download/${tag}/${this.filename}`)
-      const file = await Deno.open(this.filepath, { write: true, create: true });
-      await response.body!.pipeTo(file.writable);
+      await this.fetch_github_release_download(tag)
     } else {
       throw new Error('unimplemented for ' + import.meta.url)
     }
 
     return this.filepath
   }
-}
 
+  private async function fetch_github_release_download(tag?: string) {
+    if (tag === undefined) throw new Error(`Expected github tag, found '${tag}'`)
+    const redirect = await fetch(`https://github.com/andykais/sqlite-native/releases/download/${tag}/${this.filename}`, { redirect: 'follow'})
+    if (!redirect.redirected) throw new Error(`Expected github redirect to resource`)
+    const file = await Deno.open(this.filepath, { write: true, create: true });
+    const resource = await fetch(redirect.url)
+    await resource.body!.pipeTo(file.writable);
+  }
+}
