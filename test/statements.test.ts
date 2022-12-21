@@ -1,5 +1,5 @@
 import { create_database, assert_equals, assert_throws } from './util.ts'
-import { SqliteError } from '../src/mod.ts'
+import { SqliteError } from '../mod.ts'
 
 
 Deno.test('statements', async () => {

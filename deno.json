@@ -1,7 +1,7 @@
 {
   "tasks": {
     "lint": "deno lint",
-    "develop": "deno run --watch --check --allow-ffi --allow-env --allow-read --allow-write --unstable src/mod.ts",
+    "develop": "deno run --watch --check --allow-ffi --allow-env --allow-read --allow-write --unstable mod.ts",
     "test": "deno test --check --unstable --allow-ffi --allow-env --allow-read --allow-write test",
     "test:watch": "deno test --watch --check --unstable --allow-env --allow-ffi --allow-read --allow-write test",
     "test:only:watch": "deno test --watch --check --unstable --allow-env --allow-ffi --allow-read --allow-write",

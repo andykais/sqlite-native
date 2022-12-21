@@ -1,6 +1,6 @@
 import * as fs from "https://deno.land/std@0.153.0/fs/mod.ts";
 import * as path from "https://deno.land/std@0.153.0/path/mod.ts";
-import { Database } from '../src/mod.ts'
+import { Database } from '../mod.ts'
 
 const test_dbs_folder = path.join(path.dirname(path.fromFileUrl(import.meta.url)), 'fixtures')
 await Deno.mkdir(test_dbs_folder, { recursive: true })

@@ -1,6 +1,6 @@
 import * as fs from "https://deno.land/std@0.153.0/fs/mod.ts";
 import { create_database, get_db_path, assert_equals } from './util.ts'
-import { Database } from '../src/mod.ts'
+import { Database } from '../mod.ts'
 
 Deno.test('fresh binary install', async () => {
   const db = await create_database('test.db')
