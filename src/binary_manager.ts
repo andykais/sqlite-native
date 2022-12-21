@@ -74,7 +74,7 @@ export class SQLiteTarget {
     return this.filepath
   }
 
-  private async function fetch_github_release_download(tag?: string) {
+  private async fetch_github_release_download(tag?: string) {
     if (tag === undefined) throw new Error(`Expected github tag, found '${tag}'`)
     const redirect = await fetch(`https://github.com/andykais/sqlite-native/releases/download/${tag}/${this.filename}`, { redirect: 'follow'})
     if (!redirect.redirected) throw new Error(`Expected github redirect to resource`)
