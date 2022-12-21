@@ -67,6 +67,11 @@ export class SQLiteTarget {
       const match = pattern.exec(import_url)
       const tag = match?.pathname.groups.tag
       await this.fetch_github_release_download(tag)
+    } else if (import_url.host === 'deno.land') {
+      const pattern = new URLPattern({ pathname: '/x/:version/*' })
+      const match = pattern.exec(import_url)
+      const version = match?.pathname.groups.version
+      await this.fetch_github_release_download(version)
     } else {
       throw new Error('unimplemented for ' + import.meta.url)
     }
