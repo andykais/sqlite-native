@@ -44,11 +44,11 @@ jobs:
       # - name: Verify formatting
       #   run: deno fmt --check
 
-      - name: Run linter
+      - name: Lint
         run: deno task lint --ignore=deno_dependency_cache
 
-      - name: compile shared lib
+      - name: Compile SQLite Binary
         run: deno task compile
 
-      - name: Run tests
+      - name: Test
         run: deno task test

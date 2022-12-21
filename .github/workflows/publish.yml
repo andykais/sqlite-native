@@ -16,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Setup repo
+      - name: Setup Repo
         uses: actions/checkout@v3
 
       - name: Setup Deno
@@ -24,10 +24,10 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Run linter
-        run: deno lint
+      - name: Lint
+        run: deno task lint
 
-      - name: Run tests
+      - name: Test
         run: deno task test
 
       - name: Compile SQLite Binary
