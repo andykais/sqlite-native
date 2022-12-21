@@ -54,7 +54,7 @@ jobs:
       #   run: deno fmt --check
 
       - name: Run linter
-        run: deno lint
+        run: deno task lint --ignore=deno_dependency_cache
 
       - name: compile shared lib
         run: deno task compile
