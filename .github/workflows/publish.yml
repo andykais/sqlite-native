@@ -39,6 +39,7 @@ jobs:
           # file: binaries/*
           # file_glob: true
           file: binaries/sqlite_x86_64-unknown-linux-gnu.so
+          asset_name: sqlite_x86_64-unknown-linux-gnu.so
           tag: ${{ github.ref }}
           overwrite: true
           body: "This is my release text"
