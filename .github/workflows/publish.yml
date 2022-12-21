@@ -1,0 +1,51 @@
+name: Publish Module
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-12] #, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Setup repo
+        uses: actions/checkout@v3
+
+      - name: Compile sqlite shared library
+        uses: skx/github-action-build@master
+        with:
+          builder: deno task compile
+
+      - name: Upload binary
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # TODO what are we actually uploading
+        # with:
+        #   args: 'example-*'
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      # Uncomment this step to verify the use of 'deno fmt' on each commit.
+      # - name: Verify formatting
+      #   run: deno fmt --check
+
+      - name: Run linter
+        run: deno lint
+
+      - name: compile shared lib
+        run: 'deno task compile:linux'
+
+      - name: Run tests
+        run: deno task test
