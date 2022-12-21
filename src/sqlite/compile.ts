@@ -28,7 +28,7 @@ async function build_embedded_binary(arch: string, filename: string) {
 
 async function copy_binary(arch: string, filename: string) {
   const sqlite_target = await SQLiteTarget.create()
-  if (sqlite_target.build.os !== arch) throw new Error(`Unexpected os ${arch} when building for ${arch}`)
+  if (sqlite_target.build.os !== arch) throw new Error(`Unexpected os ${arch} does not match system os '${sqlite_target.build.os}'`)
   const src_filepath = path.join(BUILD_FOLDER, filename)
   await Deno.mkdir(path.dirname(sqlite_target.src_filepath), { recursive: true })
   console.log(`copying binary to binaries/${sqlite_target.filename}...`)
