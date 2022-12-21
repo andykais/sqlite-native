@@ -17,6 +17,11 @@ on:
 permissions:
   contents: read
 
+
+env:
+  DENO_DIR: deno_dependency_cache
+
+
 jobs:
   test:
     strategy:
@@ -34,6 +39,15 @@ jobs:
         uses: denoland/setup-deno@004814556e37c54a2f6e31384c9e18e983317366
         with:
           deno-version: v1.x
+
+
+      - name: Cache Deno dependencies 
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ hashFiles('deno.lock') }}
+
+
 
       # Uncomment this step to verify the use of 'deno fmt' on each commit.
       # - name: Verify formatting
