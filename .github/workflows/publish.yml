@@ -23,16 +23,24 @@ jobs:
         with:
           deno-version: v1.x
 
-      - name: Compile SQLite Binary
-        uses: skx/github-action-build@master
-        with:
-          builder: deno task compile
-
       - name: Lint
         run: deno task lint
 
+      - name: Compile SQLite Binary
+        run: deno task compile
+
       - name: Test
         run: deno task test
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: binaries/*
+          tag: ${{ github.ref }}
+          overwrite: true
+          file_glob: true
+          body: "This is my release text"
 
       - name: Upload Binary
         uses: skx/github-action-publish-binaries@master
