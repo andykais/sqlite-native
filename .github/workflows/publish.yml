@@ -1,4 +1,4 @@
-name: Publish Module
+name: Publish
 
 on:
   release:
@@ -36,10 +36,6 @@ jobs:
         uses: denoland/setup-deno@v1
         with:
           deno-version: v1.x
-
-      # Uncomment this step to verify the use of 'deno fmt' on each commit.
-      # - name: Verify formatting
-      #   run: deno fmt --check
 
       - name: Run linter
         run: deno lint
