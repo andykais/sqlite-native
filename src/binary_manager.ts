@@ -21,7 +21,9 @@ export class SQLiteTarget {
       if (home_dir === undefined) throw new Error(`Cannot find $HOME`)
       return path.join(home_dir, '.cache', 'deno_sqlite_native')
     } else {
-      throw new Error('unimplemented')
+      const home_dir = Deno.env.get('HOME')
+      if (home_dir === undefined) throw new Error(`Cannot find $HOME`)
+      return path.join(home_dir, '/Library/Caches', 'deno_sqlite_native')
     }
   }
   get filename() {

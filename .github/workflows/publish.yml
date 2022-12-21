@@ -1,0 +1,44 @@
+name: Publish
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: read
+
+jobs:
+  compile:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-12] #, windows-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Setup Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Lint
+        run: deno task lint
+
+      - name: Test
+        run: deno task test
+
+      - name: Compile SQLite Binary
+        uses: skx/github-action-build@master
+        with:
+          builder: deno task compile
+
+      - name: Upload Binary
+        uses: skx/github-action-publish-binaries@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # TODO what are we actually uploading
+        # with:
+        #   args: 'example-*'

@@ -5,6 +5,7 @@
     "test": "deno test --check --unstable --allow-ffi --allow-env --allow-read --allow-write test",
     "test:watch": "deno test --watch --check --unstable --allow-env --allow-ffi --allow-read --allow-write test",
     "test:only:watch": "deno test --watch --check --unstable --allow-env --allow-ffi --allow-read --allow-write",
+    "compile": "deno run --check --allow-run=gcc,unzip --allow-read=. --allow-write=. src/sqlite/compile.ts"
     "compile:macos": "deno run --check --allow-run=gcc,unzip --allow-read=. --allow-write=. src/sqlite/compile.ts macos"
     "compile:linux": "deno run --check --allow-run=gcc,unzip --allow-read=. --allow-write=. src/sqlite/compile.ts linux"
   }
