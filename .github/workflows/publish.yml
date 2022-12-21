@@ -32,6 +32,12 @@ jobs:
       - name: Test
         run: deno task test
 
+      - name: prove it exists
+        run: ls -l binaries
+
+      - name: prove it exists 2
+        run: ls -l binaries/*
+
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
