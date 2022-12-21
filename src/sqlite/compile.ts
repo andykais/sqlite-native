@@ -41,7 +41,7 @@ async function compile(arch: 'macos' | 'linux' | 'windows') {
       const filename = 'libsqlite3.dylib'
       console.log('compiling binary from sqlite3.c ...')
       await exec(`gcc -o ${BUILD_FOLDER}/${filename} ${SQLITE_SOURCE}/sqlite3.c -dynamiclib`)
-      await copy_binary(arch, filename)
+      await copy_binary('darwin', filename)
       break
     }
     case 'linux': {
