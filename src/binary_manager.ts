@@ -68,9 +68,10 @@ export class SQLiteTarget {
       const tag = match?.pathname.groups.tag
       await this.fetch_github_release_download(tag)
     } else if (import_url.host === 'deno.land') {
-      const pattern = new URLPattern({ pathname: '/x/:version/*' })
+      const pattern = new URLPattern({ pathname: '/x/:lib_id/*' })
       const match = pattern.exec(import_url)
-      const version = match?.pathname.groups.version
+      const lib_id = match?.pathname.groups.lib_id!
+      const version = lib_id.match(/sqlite_native@(.*)/)![1]
       await this.fetch_github_release_download(version)
     } else {
       throw new Error('unimplemented for ' + import.meta.url)
@@ -81,8 +82,10 @@ export class SQLiteTarget {
 
   private async fetch_github_release_download(tag?: string) {
     if (tag === undefined) throw new Error(`Expected github tag, found '${tag}'`)
-    const redirect = await fetch(`https://github.com/andykais/sqlite-native/releases/download/${tag}/${this.filename}`, { redirect: 'follow'})
-    if (!redirect.redirected) throw new Error(`Expected github redirect to resource`)
+    const github_url = `https://github.com/andykais/sqlite-native/releases/download/${tag}/${this.filename}`
+    const redirect = await fetch(github_url, { redirect: 'follow'})
+    if (!redirect.redirected) throw new Error(`Expected github redirect to resource ${github_url}`)
+    redirect.body?.cancel()
     const file = await Deno.open(this.filepath, { write: true, create: true });
     const resource = await fetch(redirect.url)
     await resource.body!.pipeTo(file.writable);
