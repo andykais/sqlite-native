@@ -64,11 +64,11 @@ export class SQLiteTarget {
       await Deno.copyFile(this.src_filepath, this.filepath)
     } else if (import_url.host === 'raw.githubusercontent.com') {
       const pattern = new URLPattern({ pathname: '/:user/:repo/:tag/*' })
-      const match = pattern.exec(url.toString())
+      const match = pattern.exec(import_url)
       const tag = match?.pathname.groups.tag
       const response = await fetch(`https://raw.githubusercontent.com/releases/download/${tag}/${this.filename}`)
       const file = await Deno.open(this.filepath, { write: true, create: true });
-      await response.body.pipeTo(file.writable);
+      await response.body!.pipeTo(file.writable);
     } else {
       throw new Error('unimplemented for ' + import.meta.url)
     }
