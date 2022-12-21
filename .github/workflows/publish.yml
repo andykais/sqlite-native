@@ -23,16 +23,16 @@ jobs:
         with:
           deno-version: v1.x
 
+      - name: Compile SQLite Binary
+        uses: skx/github-action-build@master
+        with:
+          builder: deno task compile
+
       - name: Lint
         run: deno task lint
 
       - name: Test
         run: deno task test
-
-      - name: Compile SQLite Binary
-        uses: skx/github-action-build@master
-        with:
-          builder: deno task compile
 
       - name: Upload Binary
         uses: skx/github-action-publish-binaries@master
