@@ -52,7 +52,7 @@ Deno.test('access after closed', async () => {
       val TEXT NOT NULL
     )`)
   const insert_stmt = db.prepare('INSERT INTO tbl (val) VALUES (?)')
-  const info = insert_stmt.exec('hello')
+  insert_stmt.exec('hello')
   db.close()
 
   assert_throws(() => db.prepare('INSERT INTO tbl (val) VALUES (?)'))
