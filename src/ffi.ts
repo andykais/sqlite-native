@@ -25,6 +25,7 @@ type Sqlite3Stmt = Deno.PointerValue
 
 class SqliteFFI {
   public sqlite_target?: SQLiteTarget
+  public closed: boolean = false
   private shared_lib!: Deno.DynamicLibrary<typeof SYMBOLS>
   // private lib!: Deno.DynamicLibrary<typeof SYMBOLS>['symbols']
   private sqlite_handle!: Sqlite3Handle
@@ -48,6 +49,7 @@ class SqliteFFI {
   }
 
   public close() {
+    this.closed = true
     this.shared_lib?.close()
   }
 

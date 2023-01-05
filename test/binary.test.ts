@@ -1,5 +1,5 @@
 import * as fs from "https://deno.land/std@0.153.0/fs/mod.ts";
-import { create_database, get_db_path, assert_equals } from './util.ts'
+import { create_database, get_db_path, assert_equals, assert_throws } from './util.ts'
 import { Database } from '../mod.ts'
 
 Deno.test('fresh binary install', async () => {
@@ -41,4 +41,20 @@ Deno.test('fresh binary install', async () => {
   assert_equals(rows_2[0].val, "hello")
   assert_equals(rows_2[1].val, "world")
   db_2.close()
+})
+
+Deno.test('access after closed', async () => {
+  const db = await create_database('test.db')
+
+  db.exec(`
+    CREATE TABLE tbl (
+      id INTEGER PRIMARY KEY NOT NULL,
+      val TEXT NOT NULL
+    )`)
+  const insert_stmt = db.prepare('INSERT INTO tbl (val) VALUES (?)')
+  const info = insert_stmt.exec('hello')
+  db.close()
+
+  assert_throws(() => db.prepare('INSERT INTO tbl (val) VALUES (?)'))
+  assert_throws(() => insert_stmt.exec('world'))
 })

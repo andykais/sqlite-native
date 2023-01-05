@@ -52,6 +52,10 @@ class PreparedStatement<T extends RowGeneric = RowGeneric> {
     this.sqlite = this.db.unsafeRawHandle
   }
 
+  private throw_if_closed() {
+    if (this.sqlite.closed) throw new Error('Invalid access, ffi is closed')
+  }
+
   private step() {
     if (this.sqlite.sqlite3_step(this.handle) === SQLITE3_ROW) {
       // TODO is this necessary?
@@ -69,6 +73,7 @@ class PreparedStatement<T extends RowGeneric = RowGeneric> {
   public exec(...args: BindValue[]): ExecInfo;
   public exec(args: Record<string, BindValue>): ExecInfo;
   public exec(...args: BindValue[] | [Record<string, BindValue>]): ExecInfo {
+    this.throw_if_closed()
     if (args.length === 1 && isObject(args[0])) {
       this.bindAllNamed(args[0] as Record<string, BindValue>);
     } else {
@@ -86,6 +91,7 @@ class PreparedStatement<T extends RowGeneric = RowGeneric> {
   public all(...args: BindValue[]): T[];
   public all(args: Record<string, BindValue>): T[];
   public all(...args: BindValue[] | [Record<string, BindValue>]): T[] {
+    this.throw_if_closed()
     if (args.length === 1 && isObject(args[0])) {
       this.bindAllNamed(args[0] as Record<string, BindValue>);
     } else {
@@ -105,6 +111,7 @@ class PreparedStatement<T extends RowGeneric = RowGeneric> {
   public one(...args: BindValue[]): T;
   public one(args: Record<string, BindValue>): T;
   public one(...args: BindValue[] | [Record<string, BindValue>]): T | undefined {
+    this.throw_if_closed()
     if (args.length === 1 && isObject(args[0])) {
       this.bindAllNamed(args[0] as Record<string, BindValue>);
     } else {
@@ -120,6 +127,7 @@ class PreparedStatement<T extends RowGeneric = RowGeneric> {
   }
 
   public finalize() {
+    this.throw_if_closed()
     return this.sqlite.sqlite3_finalize(this.handle)
   }
 

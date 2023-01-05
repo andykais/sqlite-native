@@ -62,6 +62,7 @@ class Database {
   }
 
   public close() {
+    this.throw_if_closed()
     this.ffi.close()
   }
 
@@ -84,6 +85,7 @@ class Database {
    * times and then `finalize` it.
    */
   public prepare<T extends RowGeneric = RowGeneric>(sql: string): PreparedStatement<T> {
+    this.throw_if_closed()
     const handle = this.ffi.sqlite3_prepare_v2(sql);
     return new PreparedStatement<T>(this, handle);
   }
@@ -125,6 +127,7 @@ class Database {
   }
 
   public transaction<T>(fn: () => T): () => T {
+    this.throw_if_closed()
     const { before, after, undo } = this.get_transaction_handlers()
     return () => {
       try {
@@ -146,6 +149,7 @@ class Database {
     * Start a transaction that lasts the duration of the promise returned.
     */
   public transaction_async<T>(func: () => Promise<T>): () => Promise<T> {
+    this.throw_if_closed()
     const { before, after, undo } = this.get_transaction_handlers()
     return async () => {
       try {
@@ -182,6 +186,10 @@ class Database {
         undo: `ROLLBACK`,
       }
     }
+  }
+
+  private throw_if_closed() {
+    if (this.ffi.closed) throw new Error('Invalid access, ffi is closed')
   }
 }
 
