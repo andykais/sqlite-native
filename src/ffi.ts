@@ -11,17 +11,10 @@ import { toCString, isNull, SqliteError } from "./util.ts";
 import type { DatabaseOptions } from './database.ts'
 import type { SQLiteColumnType } from './statement.ts'
 
-interface DenoCore {
-  core: {
-    ops: {
-      op_ffi_cstr_read: (ptr: Deno.PointerValue) => string
-    }
-  }
-}
-const { op_ffi_cstr_read } = ((Deno as unknown) as DenoCore).core.ops;
 
 type Sqlite3Handle = Deno.PointerValue
 type Sqlite3Stmt = Deno.PointerValue
+
 
 class SqliteFFI {
   public sqlite_target?: SQLiteTarget
@@ -62,19 +55,19 @@ class SqliteFFI {
 
   public sqlite3_libversion(): string {
     const ptr = this.lib.sqlite3_libversion();
-    return op_ffi_cstr_read(ptr);
+    return Deno.UnsafePointerView.getCString(ptr);
   }
 
   public sqlite3_errmsg(handle: sqlite3): string {
     const ptr = this.lib.sqlite3_errmsg(handle);
     if (isNull(ptr)) return "";
-    return op_ffi_cstr_read(ptr);
+    return Deno.UnsafePointerView.getCString(ptr);
   }
 
   public sqlite3_errstr(result: number): string {
     const ptr = this.lib.sqlite3_errstr(result);
     if (isNull(ptr)) return "";
-    return op_ffi_cstr_read(ptr);
+    return Deno.UnsafePointerView.getCString(ptr);
   }
 
   public unwrap_error(
@@ -279,7 +272,7 @@ class SqliteFFI {
   ): string | null {
     const ptr = this.lib.sqlite3_column_text(stmt, col);
     if (isNull(ptr)) return null;
-    return op_ffi_cstr_read(ptr);
+    return Deno.UnsafePointerView.getCString(ptr);
   }
 
   public sqlite3_column_text16(
@@ -291,7 +284,7 @@ class SqliteFFI {
       col,
     );
     if (isNull(ptr)) return null;
-    return op_ffi_cstr_read(ptr);
+    return Deno.UnsafePointerView.getCString(ptr);
   }
 
   public sqlite3_column_int(stmt: sqlite3_stmt, col: number): number {
@@ -339,7 +332,7 @@ class SqliteFFI {
 
     if (result !== SQLITE3_OK) {
       const ptr = outPtr[0] + 2 ** 32 * outPtr[1];
-      const msg = op_ffi_cstr_read(ptr);
+      const msg = Deno.UnsafePointerView.getCString(ptr);
       this.sqlite3_free(outPtr[0]);
       throw new Error(`(${result}) ${msg}`);
     }
@@ -374,12 +367,12 @@ class SqliteFFI {
       stmt,
       index,
     );
-    return op_ffi_cstr_read(name);
+    return Deno.UnsafePointerView.getCString(name);
   }
 
   public sqlite3_column_name(stmt: sqlite3_stmt, col: number): string {
     const name = this.lib.sqlite3_column_name(stmt, col);
-    return op_ffi_cstr_read(name);
+    return Deno.UnsafePointerView.getCString(name);
   }
 
   public sqlite3_changes(): number {
@@ -486,13 +479,13 @@ class SqliteFFI {
   public sqlite3_sql(stmt: sqlite3_stmt): string | null {
     const ptr = this.lib.sqlite3_sql(stmt);
     if (isNull(ptr)) return null;
-    else return op_ffi_cstr_read(ptr);
+    else return Deno.UnsafePointerView.getCString(ptr);
   }
 
   public sqlite3_expanded_sql(stmt: sqlite3_stmt): string | null {
     const ptr = this.lib.sqlite3_expanded_sql(stmt);
     if (isNull(ptr)) return null;
-    const str = op_ffi_cstr_read(ptr);
+    const str = Deno.UnsafePointerView.getCString(ptr);
     this.sqlite3_free(ptr);
     return str;
   }
@@ -521,7 +514,7 @@ class SqliteFFI {
 
   public sqlite3_sourceid(): string {
     const ptr = this.lib.sqlite3_sourceid();
-    return op_ffi_cstr_read(ptr);
+    return Deno.UnsafePointerView.getCString(ptr);
   }
 
 }
