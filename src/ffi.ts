@@ -83,10 +83,9 @@ class SqliteFFI {
           msg = this.sqlite3_errstr(result);
         } else msg = this.sqlite3_errmsg(db);
       } catch (e) {
-        msg = new Error(`Failed to get error message.`);
-        msg.cause = e;
+        throw new Error('Failed to get error message', { cause: e })
       }
-      throw new SqliteError(result, `${this.sqlite3_errstr(result)}: ${msg}`);
+      throw new SqliteError(result, msg);
     }
   }
 
